@@ -1,0 +1,99 @@
+ 1    import time
+ 2    from machine import SoftI2C, Pin, I2C
+ 3    from max30102 import MAX30102
+ 4    from utime import ticks_ms, ticks_diff
+ 5    from pulse_oximeter import Pulse_oximeter, IIR_filter
+ 6    
+ 7    led = Pin(5, Pin.OUT)
+ 8    led.value(1)
+ 9    
+10    my_SCL_pin = 25         # I2C SCL 腳位
+11    my_SDA_pin = 26         # I2C SDA 腳位
+12    
+13    i2c = SoftI2C(sda=Pin(my_SDA_pin),
+14                  scl=Pin(my_SCL_pin))
+15    
+16    sensor = MAX30102(i2c=i2c)
+17    sensor.setup_sensor()
+18    
+19    pox = Pulse_oximeter(sensor)
+20    
+21    thresh_generator = IIR_filter(0.9) # 用於產生動態閾值
+22    dc_extractor = IIR_filter(0.99)    # 用於提取直流成份
+23    
+24    is_beating = False
+25    beat_time_mark = ticks_ms()
+26    hr_rate = 0
+27    num_beats = 0
+28    target_n_beats = 3    # 設定要幾次心跳才更新一次心率
+29    tot_intval = 0
+30    
+31    def cal_heart_rate(intval, target_n_beats=3):
+32        intval /= 1000
+33        heart_rate = target_n_beats/(intval/60)
+34        heart_rate = round(heart_rate, 1)
+35        return heart_rate
+36    
+37    def trim(data, length=300):
+38        if len(data) > length:
+39            data = data[:length]
+40        else:
+41            data = data + [0 for _ in range(length - len(data))]
+42        return data
+43    
+44    data = []
+45    file = open('ppg.txt', 'w')    # 開啟txt檔
+46    num_completed = 0
+47    target_num = 50
+48    while (True):
+49        pox.update()
+50        if pox.available():
+51            red_val = pox.get_raw_red()
+52            red_dc = dc_extractor.step(red_val)
+53            ppg = int(red_dc*1.01 - red_val)
+54            data.append(ppg)
+55            thresh = thresh_generator.step(ppg)
+56            
+57            if ppg > (thresh + 20) and not is_beating:
+58                is_beating = True
+59                led.value(0)
+60    
+61                rr_intval = ticks_diff(
+62                    ticks_ms(), beat_time_mark)
+63                if 2000 > rr_intval > 270:
+64                    tot_intval += rr_intval
+65                    num_beats += 1
+66                    if num_beats == target_n_beats:
+67                        heart_rate = cal_heart_rate(
+68                            tot_intval, target_n_beats)
+69                        data = trim(data)
+70                        for point in data:
+71                            print(point)
+72                        print("心率:", heart_rate)
+73                        yn = input("是否儲存(Y/N)?")
+74                        if yn in ("y", "Y", "yes"):
+75                            num_completed += 1
+76                            print("已儲存: %s/%s 筆資料" % 
+77                                (num_completed, target_num))
+78                            # 將 data 存到檔案中
+79                            file.write(str(data)[1: -1]) 
+80                            # 換行字元
+81                            file.write("\n")             
+82                            if num_completed == target_num:
+83                                print("完成!")
+84                                break
+85                        else:
+86                            print("放棄儲存")
+87                        tot_intval = 0
+88                        num_beats = 0
+89                        data = []
+90                else:
+91                    tot_intval = 0
+92                    num_beats = 0
+93                    data = []
+94                beat_time_mark = ticks_ms()
+95            elif ppg < thresh:
+96                is_beating = False
+97                led.value(1)
+98    
+99    file.close()
