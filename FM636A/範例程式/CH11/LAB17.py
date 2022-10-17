@@ -1,8 +1,8 @@
-import time
-from machine import SoftI2C, Pin, I2C
-from max30102 import MAX30102
 from utime import ticks_ms, ticks_diff
+from machine import SoftI2C, Pin
+from max30102 import MAX30102
 from pulse_oximeter import Pulse_oximeter, IIR_filter
+
 
 led = Pin(5, Pin.OUT)
 led.value(1)
@@ -19,14 +19,15 @@ sensor.setup_sensor()
 pox = Pulse_oximeter(sensor)
 
 thresh_generator = IIR_filter(0.9) # 用於產生動態閾值
-dc_extractor = IIR_filter(0.99)    # 用於提取直流成份
+dc_extractor = IIR_filter(0.99)    # 用於提取DC成分
 
 is_beating = False
 beat_time_mark = ticks_ms()
-hr_rate = 0
+heart_rate = 0
 num_beats = 0
-target_n_beats = 3    # 設定要幾次心跳才更新一次心率
+target_n_beats = 3
 tot_intval = 0
+
 
 def cal_heart_rate(intval, target_n_beats=3):
     intval /= 1000
@@ -42,24 +43,25 @@ def trim(data, length=300):
     return data
 
 data = []
-file = open('ppg.txt', 'w')    # 開啟txt檔
+file  = open('ppg.txt','w')    # 開啟txt檔
 num_completed = 0
 target_num = 50
-while (True):
+
+while True:
     pox.update()
+
     if pox.available():
         red_val = pox.get_raw_red()
         red_dc = dc_extractor.step(red_val)
         ppg = int(red_dc*1.01 - red_val)
         data.append(ppg)
         thresh = thresh_generator.step(ppg)
-        
+
         if ppg > (thresh + 20) and not is_beating:
             is_beating = True
             led.value(0)
 
-            rr_intval = ticks_diff(
-                ticks_ms(), beat_time_mark)
+            rr_intval = ticks_diff(ticks_ms(), beat_time_mark)
             if 2000 > rr_intval > 270:
                 tot_intval += rr_intval
                 num_beats += 1
@@ -73,12 +75,9 @@ while (True):
                     yn = input("是否儲存(Y/N)?")
                     if yn in ("y", "Y", "yes"):
                         num_completed += 1
-                        print("已儲存: %s/%s 筆資料" % 
-                            (num_completed, target_num))
-                        # 將 data 存到檔案中
-                        file.write(str(data)[1: -1]) 
-                        # 換行字元
-                        file.write("\n")             
+                        print("已儲存: %s/%s 筆資料" % (num_completed, target_num))
+                        file.write(str(data)[1: -1]) # data存到檔案中
+                        file.write("\n")             # 換行字元
                         if num_completed == target_num:
                             print("完成!")
                             break

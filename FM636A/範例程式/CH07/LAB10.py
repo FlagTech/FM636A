@@ -2,10 +2,10 @@ from utime import ticks_ms, ticks_diff
 from machine import Pin, ADC
 
 
-adc_pin = Pin(36)        
-adc = ADC(adc_pin)       
+adc_pin = Pin(36)
+adc = ADC(adc_pin)
 adc.width(ADC.WIDTH_10BIT)
-adc.atten(ADC.ATTN_11DB) 
+adc.atten(ADC.ATTN_11DB)
 
 time_mark = ticks_ms()
 while True:
