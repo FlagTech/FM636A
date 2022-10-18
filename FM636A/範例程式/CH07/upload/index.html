@@ -169,32 +169,12 @@ Your browser does not support the HTML5 canvas tag.</canvas>
       return (val - in_min)/(in_max - in_min)*(out_max - out_min) + out_min;
     }
 
-    var step = 0;
-    var step2 = 0;
     function drawline() {
       if (isrun) {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
-          // if (this.readyState == 4 && this.status == 200) {
-          if (true) {
-            step ++;
-            step2 ++;
-            // rawliney = parseInt(this.responseText);
-            if (step <= 20) {
-              rawliney += 1000;
-            }
-            else if (step <= 40) {
-              rawliney -= 1000;
-            }
-            else {
-              step = 0;
-            }
-            if (step2 % 100 == 0) {
-              rawliney += 3000;
-            }
-            if (step2 % 200 == 0) {
-              rawliney *= 0.5;
-            }
+          if (this.readyState == 4 && this.status == 200) {
+            rawliney = parseInt(this.responseText);
 
             if (init_step >= 20) {
               if (rawliney > max_tmp) {
@@ -271,7 +251,7 @@ Your browser does not support the HTML5 canvas tag.</canvas>
     <button type="button" class="button loc" onclick='start()'>開始</button>
     <button type="button" class="button loc" onclick='stop()'>停止</button>
     <div class="bpm">
-      <p><span id="nosetype">👃&emsp;</span><span id="hr">100</span>次/分</p>
+      <p><span id="nosetype">👃&emsp;</span><span id="hr">--.-</span>次/分</p>
     </div>
   </div>
   <div class="bar">

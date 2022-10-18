@@ -1,16 +1,15 @@
-from machine import SoftI2C, Pin, I2C
-from max30102 import MAX30102
 from utime import ticks_ms, ticks_diff
+from machine import SoftI2C, Pin
+from max30102 import MAX30102
 from pulse_oximeter import Pulse_oximeter, IIR_filter
-import ulab as np
 from keras_lite import Model
+import ulab as np
 
-# 增加神經網路的參數
+
 mean = 130.50358333333332 # 請改成訓練模型時的資料集平均數
 std = 1514.8632605465837  # 請改成訓練模型時的資料集標準差
-model = Model('ppg_model.json')  # 建立模型物件
-label_name = [
-    'others', 'ppg'] # label名稱,要與建立模型時的順序一樣
+model = Model('ppg_model.json') # 建立模型物件
+label_name = ['others', 'ppg']   # label名稱要與建立模型時的順序一樣
 
 
 led = Pin(5, Pin.OUT)
@@ -27,14 +26,14 @@ sensor.setup_sensor()
 
 pox = Pulse_oximeter(sensor)
 
-thresh_generator = IIR_filter(0.9)  # 用於產生動態閾值
-dc_extractor = IIR_filter(0.99)    # 用於提取直流成份
+thresh_generator = IIR_filter(0.9) # 用於產生動態閾值
+dc_extractor = IIR_filter(0.99)    # 用於提取DC成分
 
 is_beating = False
 beat_time_mark = ticks_ms()
-hr_rate = 0
+heart_rate = 0
 num_beats = 0
-target_n_beats = 3    # 設定要幾次心跳才更新一次心率
+target_n_beats = 3
 tot_intval = 0
 
 
@@ -44,7 +43,6 @@ def cal_heart_rate(intval, target_n_beats=3):
     heart_rate = round(heart_rate, 1)
     return heart_rate
 
-
 def trim(data, length=300):
     if len(data) > length:
         data = data[:length]
@@ -52,10 +50,17 @@ def trim(data, length=300):
         data = data + [0 for _ in range(length - len(data))]
     return data
 
+def get_label(data):
+    data = trim(data)
+    data = np.array([data])
+    data = (data - mean)/std
+    pred_class = model.predict_classes(data)
+    label = label_name[pred_class[0]]
+    return label
 
 data = []
 
-while (True):
+while True:
     pox.update()
 
     if pox.available():
@@ -69,18 +74,12 @@ while (True):
             is_beating = True
             led.value(0)
 
-            rr_intval = ticks_diff(
-                ticks_ms(), beat_time_mark)
+            rr_intval = ticks_diff(ticks_ms(), beat_time_mark)
             if 2000 > rr_intval > 270:
                 tot_intval += rr_intval
                 num_beats += 1
-                if num_beats == 3:
-                    data = trim(data)
-                    data = np.array([data])
-                    data = (data - mean)/std
-                    pred_class = model.predict_classes(
-                        data)
-                    label = label_name[pred_class[0]]
+                if num_beats == target_n_beats:
+                    label = get_label(data)
                     print('類別:', label)
                     if label == "ppg":
                         heart_rate = cal_heart_rate(

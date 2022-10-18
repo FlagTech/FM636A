@@ -1,7 +1,7 @@
-import network, ESPWebServer
-from machine import SoftI2C, Pin, ADC
-from utime import ticks_ms, ticks_diff
 import _thread
+from utime import ticks_ms, ticks_diff
+from machine import SoftI2C, Pin
+import network, ESPWebServer
 from max30102 import MAX30102
 from pulse_oximeter import Pulse_oximeter, IIR_filter
 
@@ -20,15 +20,15 @@ sensor.setup_sensor()
 
 pox = Pulse_oximeter(sensor)
 
-dc_extractor = IIR_filter(0.99)    # 用於提取直流成份
+dc_extractor = IIR_filter(0.99)    # 用於提取DC成分
 thresh_generator = IIR_filter(0.9) # 用於產生動態閾值
 
-is_beating = False           # 紀錄是否正在跳動的旗標
-beat_time_mark = ticks_ms()  # 紀錄心跳時間點
+is_beating = False    # 紀錄是否正在跳動的旗標
+beat_time_mark = ticks_ms()    # 紀錄心跳時間點
 heart_rate = 0
-num_beats = 0         # 紀錄心跳次數
+num_beats = 0    # 紀錄心跳次數
 target_n_beats = 3    # 設定要幾次心跳才更新一次心率
-tot_intval = 0        # 紀錄心跳時間區間
+tot_intval = 0    # 紀錄心跳時間區間
 ppg = 0
 
 def cal_heart_rate(intval, target_n_beats=3):
@@ -37,46 +37,45 @@ def cal_heart_rate(intval, target_n_beats=3):
     heart_rate = round(heart_rate, 1)
     return heart_rate
 
-def SendHrRate(socket, args):    # 處理 /hr 指令的函式
+def SendHrRate(socket, args):  # 處理 /hr 指令的函式
     ESPWebServer.ok(socket, "200", str(heart_rate))
-    
-def SendEcg(socket, args):    # 處理 /line 指令的函式
+
+def SendEcg(socket, args):     # 處理 /line 指令的函式
     ESPWebServer.ok(socket, "200", str(ppg))
-    
+
 def web_thread():    # 處理網頁的子執行緒函式
     while True:
         ESPWebServer.handleClient()
-    
+
 print("連接中...")
 sta = network.WLAN(network.STA_IF)
 sta.active(True)
-sta.connect("無線網路名稱", "無線網路密碼")
+sta.connect("熱點名稱", "熱點密碼")
 
 while not sta.isconnected():
     pass
 
 print("已連接, ip為:", sta.ifconfig()[0])
 
-ESPWebServer.begin(80)                 # 啟用網站
-ESPWebServer.onPath("/hr", SendHrRate) # 指定處理指令的函式
+ESPWebServer.begin(80)                  # 啟用網站
+ESPWebServer.onPath("/hr", SendHrRate)  # 指定處理指令的函式
 ESPWebServer.onPath("/line", SendEcg)  # 指定處理指令的函式
-ESPWebServer.setDocPath("/")           # 指定 HTML 檔路徑
 
-_thread.start_new_thread(web_thread, ())   # 啟動子執行緒
+_thread.start_new_thread(web_thread, ())    # 啟動子執行緒
 
-while True:         # 主執行緒
+while True:    # 主執行緒
     pox.update()    # 更新血氧模組
-    
+
     if pox.available():
         red_val = pox.get_raw_red()
         red_dc = dc_extractor.step(red_val)
         ppg = max(int(red_dc*1.01 - red_val), 0)
         thresh = thresh_generator.step(ppg)
-        
+
         if ppg > (thresh + 20) and not is_beating:
             is_beating = True
             led.value(0)
-            
+
             intval = ticks_diff(ticks_ms(), beat_time_mark)
             if 2000 > intval > 270:
                 tot_intval += intval

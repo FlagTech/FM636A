@@ -1,6 +1,5 @@
 from machine import SoftI2C, Pin
 from max30102 import MAX30102
-from utime import ticks_ms, ticks_diff
 from pulse_oximeter import Pulse_oximeter
 
 
@@ -15,10 +14,10 @@ sensor.setup_sensor()
 
 pox = Pulse_oximeter(sensor) # 使用血氧濃度計算類別
 
-while (True):
+while True:
     pox.update()
- 
+
     spo2 = pox.get_spo2()
-    
+
     if spo2 > 0:
         print("SpO2:", spo2, "%")
