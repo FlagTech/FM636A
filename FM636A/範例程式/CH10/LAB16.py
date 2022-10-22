@@ -115,13 +115,6 @@ while True:
             pulse_is_beating = True
             led.value(0)
             print("pulse beat!")
-            pulse_time_mark = ticks_ms()
-
-            if detected_heart_beat:
-                pwtt = ticks_diff(pulse_time_mark, heart_time_mark)
-                print("pwtt =", pwtt)
-                bp = cal_bp(pwtt)
-                detected_heart_beat = False
 
             rr_intval = ticks_diff(ticks_ms(), pulse_time_mark)
 
@@ -131,11 +124,20 @@ while True:
                 if num_beats == target_n_beats:
                     heart_rate = cal_heart_rate(
                         tot_intval, target_n_beats)
+                    print("heart rate =", heart_rate)
                     tot_intval = 0
                     num_beats = 0
             else:
                 tot_intval = 0
                 num_beats = 0
+            pulse_time_mark = ticks_ms()
+
+            if detected_heart_beat:
+                pwtt = ticks_diff(pulse_time_mark, heart_time_mark)
+                print("pwtt =", pwtt)
+                bp = cal_bp(pwtt)
+                print("bp =", bp)
+                detected_heart_beat = False
 
         elif ppg < thresh_pulse:
             pulse_is_beating = False

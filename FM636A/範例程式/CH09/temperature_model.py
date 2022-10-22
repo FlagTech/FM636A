@@ -5,8 +5,8 @@ path_name = 'temperature.txt'
 Data_reader = kc.Data_reader(path_name, mode='regression')
 data, label = Data_reader.read()
 
-# %% 資料預處理
 
+# %% 資料預處理
 # 取資料中的 85% 當作訓練集
 split_num = int(len(data)*0.85) 
 train_data = data[:split_num]
@@ -20,8 +20,8 @@ data /= std
 
 label /= 100     # 將 label範圍落在 0~1 (label正規化)
 
-# %% 訓練集、驗證集、測試集的資料形狀
 
+# %% 訓練集、驗證集、測試集的資料形狀
 # 訓練集
 print(train_data.shape)    
 
@@ -35,8 +35,8 @@ test_data = data[-5:]
 print(test_data.shape)
 test_label = label[-5:] 
 
-# %% 建立神經網路架構
 
+# %% 建立神經網路架構
 from tensorflow.keras.models import Sequential
 from tensorflow.keras import layers
 
@@ -49,15 +49,14 @@ model.add(layers.Dense(1))
 model.summary()    # 顯示模型資訊
 
 # %% 編譯及訓練模型
-
 model.compile(optimizer='adam', loss='mse', metrics=['mae'])
 train_history = model.fit(
     train_data, train_label,  # 測試集
     validation_data=(validation_data, validation_label),  # 驗證集
     epochs=1000)  # 訓練週期
 
-# %% 測試模型
 
+# %% 測試模型
 # 預測值
 print('prediction:')
 print(model.predict(test_data))
@@ -66,11 +65,11 @@ print()
 print('groundtruth:')
 print(test_label)
 
-# %% 儲存模型
 
-kc.save(model,'temperature_model.json')
+# %% 儲存模型
+# kc.save(model,'temperature_model.json')
+
 
 # %% 顯示正規化相關資訊
-
 print('mean =',mean)
 print('std =',std)

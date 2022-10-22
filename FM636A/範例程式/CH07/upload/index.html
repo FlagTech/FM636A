@@ -19,7 +19,6 @@
 
     div.bpm {
       width: 50%;
-      text-align: right;
       display: inline-block;
     }
 
@@ -154,14 +153,14 @@ Your browser does not support the HTML5 canvas tag.</canvas>
     function heartbeat1() {
       if (isrun) {
         document.getElementById("nosetype").innerHTML =
-          "👃💨";
+          "💨";
       }
     }
 
     function heartbeat2() {
       if (isrun) {
         document.getElementById("nosetype").innerHTML =
-          "👃&emsp;";
+          "👃";
       }
     }
 
@@ -251,7 +250,7 @@ Your browser does not support the HTML5 canvas tag.</canvas>
     <button type="button" class="button loc" onclick='start()'>開始</button>
     <button type="button" class="button loc" onclick='stop()'>停止</button>
     <div class="bpm">
-      <p><span id="nosetype">👃&emsp;</span><span id="hr">--.-</span>次/分</p>
+      <p><span id="hr">--.-</span>次/分<span id="nosetype">👃</span></p>
     </div>
   </div>
   <div class="bar">

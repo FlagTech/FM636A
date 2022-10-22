@@ -98,8 +98,8 @@ class Data_reader():
             train_data = np.array(train_data)
         else:
             train_data = pad_sequences(
-                train_data, maxlen = maxlen,
-                truncating = 'post').astype('float')
+                train_data, maxlen=maxlen,
+                truncating='post').astype('float')
 
         if shuffle:
             np.random.seed(random_seed)
