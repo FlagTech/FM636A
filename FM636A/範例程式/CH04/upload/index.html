@@ -75,13 +75,19 @@
   </style>
 
   <script type="text/javascript">
-    var value = 50;
+    var value = 0;
     var isrun = false;
 
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
-      if (this.readyState == 4 && this.status == 200) {
-        value = parseInt(this.responseText);
+    function getvalue() {
+      if (isrun) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+          if (this.readyState == 4 && this.status == 200) {
+            value = parseInt(this.responseText);
+          }
+        };
+        xhttp.open("GET", "/measure", true);
+        xhttp.send();
         if (value == 0) {
           document.getElementById("snum").innerHTML = "--";
           document.getElementById("r1").innerHTML = "";
@@ -89,42 +95,26 @@
         }
         else {
           document.getElementById("snum").innerHTML = value;
+          if (value > 0 && value <= 18) {
+            document.getElementById("r1").innerHTML = "▁ ";
+            document.getElementById("r2").innerHTML = "▂ ▃ ▅ ▆ ▇";
+          } else if (value > 18 && value <= 36) {
+            document.getElementById("r1").innerHTML = "▁ ▂ ";
+            document.getElementById("r2").innerHTML = "▃ ▅ ▆ ▇";
+          } else if (value > 36 && value <= 54) {
+            document.getElementById("r1").innerHTML = "▁ ▂ ▃ ";
+            document.getElementById("r2").innerHTML = "▅ ▆ ▇";
+          } else if (value > 54 && value <= 72) {
+            document.getElementById("r1").innerHTML = "▁ ▂ ▃ ▅ ";
+            document.getElementById("r2").innerHTML = "▆ ▇";
+          } else if (value > 72 && value <= 90) {
+            document.getElementById("r1").innerHTML = "▁ ▂ ▃ ▅ ▆ ";
+            document.getElementById("r2").innerHTML = "▇";
+          } else if (value > 90 && value <= 100) {
+            document.getElementById("r1").innerHTML = "▁ ▂ ▃ ▅ ▆ ▇";
+            document.getElementById("r2").innerHTML = "";
+          }
         }
-
-        if (value > 0 && value <= 18) {
-          document.getElementById("r1").innerHTML = "▁ ";
-          document.getElementById("r2").innerHTML = "▂ ▃ ▅ ▆ ▇";
-        } else if (value > 18 && value <= 36) {
-          document.getElementById("r1").innerHTML = "▁ ▂ ";
-          document.getElementById("r2").innerHTML = "▃ ▅ ▆ ▇";
-        } else if (value > 36 && value <= 54) {
-          document.getElementById("r1").innerHTML = "▁ ▂ ▃ ";
-          document.getElementById("r2").innerHTML = "▅ ▆ ▇";
-        } else if (value > 54 && value <= 72) {
-          document.getElementById("r1").innerHTML = "▁ ▂ ▃ ▅ ";
-          document.getElementById("r2").innerHTML = "▆ ▇";
-        } else if (value > 72 && value <= 90) {
-          document.getElementById("r1").innerHTML = "▁ ▂ ▃ ▅ ▆ ";
-          document.getElementById("r2").innerHTML = "▇";
-        } else if (value > 90 && value <= 100) {
-          document.getElementById("r1").innerHTML = "▁ ▂ ▃ ▅ ▆ ▇";
-          document.getElementById("r2").innerHTML = "";
-        }
-        if (isrun) {
-          window.setTimeout(function () {
-            getvalue();
-          }, 1000);
-        }
-      }
-
-    }
-
-
-
-    function getvalue() {
-      if (isrun) {
-        xhttp.open("GET", "/measure", true);
-        xhttp.send();
       }
     }
 
@@ -135,12 +125,12 @@
       } else {
         isrun = true;
         document.getElementById("switch").innerHTML = "▢";
-        getvalue();
       }
     }
-    // window.setInterval(function () {
-    //   getvalue();
-    // }, 100);
+
+    window.setInterval(function () {
+      getvalue();
+    }, 100);
   </script>
 
 </head>
@@ -148,8 +138,7 @@
 <body class=preventcopy ondragstart="return false" oncontextmenu="return false" onselectstart="return false">
   <div>
     <p class="title">🩸SpO2&emsp;</p>
-    <p class="num"><span id="snum">--</span></p>
-    <p1>%</p1>
+    <p class="num"><span id="snum">--</span></p><p1>%</p1>
     <p><span id="r1" class="ruler1"></span><span id="r2" class="ruler2">▁ ▂ ▃ ▅ ▆ ▇</span></p>
     <button type="button" class="button" onclick='start()'><span id=switch>▷</span></button>
   </div>

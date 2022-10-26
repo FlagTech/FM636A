@@ -68,7 +68,7 @@ while True:
             led.value(0)
 
             intval = ticks_diff(ticks_ms(), breath_time_mark)
-            if 2000 > intval > 270:
+            if 60000 > intval > 1000:
                 tot_intval += intval
                 num_breath += 1
                 if num_breath == target_n_breath:

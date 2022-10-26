@@ -56,4 +56,4 @@ print(test_label)
 
 
 # %% 儲存模型
-#kc.save(model,'bp_model.json')
+# kc.save(model,'bp_model.json')

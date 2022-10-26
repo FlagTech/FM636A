@@ -17,10 +17,10 @@
   <canvas id="myCanvas" width="1000" height="500"
     style="border:3px solid #d3d3d3c5;"></canvas>
   <script>
+    var bg_color = '#b2fffe';
     function canvas_arrow(context, fromx, fromy, tox, toy) {
       var headlen = 250; // length of head in pixels
       var angle = Math.atan2(toy - fromy, tox - fromx);
-      var bg_color = '#b2fffe';
 
       context.beginPath();
       context.moveTo(fromx, fromy);
@@ -141,12 +141,12 @@
         harmonicX(250, arrowX, centerX),
         circley(harmonicX(250, arrowX, centerX),
         centerX, centerY, radius - 50));
-      if (arrowX < 240) {
+      if (arrowX <= 225) {
         draw_text(ctx, '實話', 150, 350, 'red', true, '#ffffd9');
       } else {
         draw_text(ctx, '實話', 150, 350, 'red', true, bg_color);
       }
-      if (arrowX > 300) {
+      if (arrowX >= 315) {
         draw_text(ctx, '謊話', 850, 350, 'green', true, '#ffffd9');
       } else {
         draw_text(ctx, '謊話', 850, 350, 'green', true, bg_color);
@@ -162,7 +162,7 @@
       };
       xhttp.open("GET", "/lie", true);
       xhttp.send();
-      // data = 260;
+      // data = 350;
     }
     window.setInterval(function () {
       drawarrow();

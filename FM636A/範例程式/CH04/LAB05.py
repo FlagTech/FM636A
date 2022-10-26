@@ -1,3 +1,4 @@
+from utime import ticks_ms, ticks_diff # 匯入 utime 模組用以計時
 from machine import SoftI2C, Pin
 import network, ESPWebServer
 from max30102 import MAX30102
@@ -33,12 +34,19 @@ print("已連接, ip為:", sta.ifconfig()[0])
 ESPWebServer.begin(80)                     # 啟用網站
 ESPWebServer.onPath("/measure", SendSpo2)  # 指定處理指令的函式
 
+time_mark = ticks_ms()
 while True:
     ESPWebServer.handleClient()
 
     pox.update()
 
-    spo2 = pox.get_spo2()
+    spo2_tmp = pox.get_spo2()
+    spo2_tmp = round(spo2_tmp, 1)
 
-    if spo2 > 0:
+    if spo2_tmp > 0:
+        time_mark = ticks_ms()
+        spo2 = spo2_tmp
         print("SpO2:", spo2, "%")
+        
+    if ticks_diff(ticks_ms(), time_mark) > 5000:
+        spo2 = 0
