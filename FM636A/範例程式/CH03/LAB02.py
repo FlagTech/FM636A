@@ -11,3 +11,4 @@ while True:
     gsr = adc.read()
     print(gsr)
     time.sleep(0.1)
+    

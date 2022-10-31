@@ -8,6 +8,7 @@ import ulab as np             # 匯入 ulab 模組並命名為 np
 
 model = Model('temperature_model.json')     # 建立模型物件
 
+# 增加神經網路的參數與模型
 mean = 637.7357512953367  #平均值
 std = 217.74074905622302  #標準差
 
@@ -37,17 +38,17 @@ def web_thread():    # 處理網頁的子執行緒函式
 print("連接中...")
 sta = network.WLAN(network.STA_IF)
 sta.active(True)
-sta.connect("熱點名稱", "熱點密碼")
+sta.connect("FLAG-SCHOOL", "12345678")
 
 while not sta.isconnected():
     pass
 
 print("已連接, ip為:", sta.ifconfig()[0])
 
-ESPWebServer.begin(80)                  # 啟用網站
-ESPWebServer.onPath("/measure", SendTemp)  # 指定處理指令的函式
+ESPWebServer.begin(80)                   # 啟用網站
+ESPWebServer.onPath("/measure", SendTemp)# 指定處理指令的函式
 
-_thread.start_new_thread(web_thread, ())    # 啟動子執行緒
+_thread.start_new_thread(web_thread, ()) # 啟動子執行緒
 
 while True:
     data = 0
@@ -59,3 +60,4 @@ while True:
 
     temp = cal_temp(data)
     print(temp)
+    

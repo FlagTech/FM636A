@@ -27,7 +27,7 @@ sensor.setup_sensor()
 pox = Pulse_oximeter(sensor)
 
 thresh_generator = IIR_filter(0.9) # 用於產生動態閾值
-dc_extractor = IIR_filter(0.99)    # 用於提取DC成分
+dc_extractor = IIR_filter(0.99)    # 用於提取直流成分
 
 is_beating = False
 beat_time_mark = ticks_ms()
@@ -74,7 +74,8 @@ while True:
             is_beating = True
             led.value(0)
 
-            rr_intval = ticks_diff(ticks_ms(), beat_time_mark)
+            rr_intval = ticks_diff(
+                ticks_ms(), beat_time_mark)
             if 2000 > rr_intval > 270:
                 tot_intval += rr_intval
                 num_beats += 1

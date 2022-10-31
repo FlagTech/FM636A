@@ -14,12 +14,12 @@ adc.atten(ADC.ATTN_11DB)    # 設定最大電壓
 
 thresh_generator = IIR_filter(0.9) # 用於產生動態閾值
 
-is_beating = False    # 紀錄是否正在跳動的旗標
+is_beating = False             # 紀錄是否正在跳動的旗標
 beat_time_mark = ticks_ms()    # 紀錄心跳時間點
 heart_rate = 0
-num_beats = 0    # 紀錄心跳次數
-target_n_beats = 3    # 設定要幾次心跳才更新一次心率
-tot_intval = 0    # 紀錄心跳時間區間
+num_beats = 0                  # 紀錄心跳次數
+target_n_beats = 3             # 設定要幾次心跳才更新一次心率
+tot_intval = 0                 # 紀錄心跳時間區間
 max_val = 0
 ecg = 0
 
@@ -32,7 +32,7 @@ def cal_heart_rate(intval, target_n_beats=3):
 def SendHrRate(socket, args):    # 處理 /hr 指令的函式
     ESPWebServer.ok(socket, "200", str(heart_rate))
 
-def SendEcg(socket, args):    # 處理 /line 指令的函式
+def SendEcg(socket, args):       # 處理 /line 指令的函式
     ESPWebServer.ok(socket, "200", str(ecg))
 
 def web_thread():
@@ -42,7 +42,7 @@ def web_thread():
 print("連接中...")
 sta = network.WLAN(network.STA_IF)
 sta.active(True)
-sta.connect("熱點名稱", "熱點密碼")
+sta.connect("FLAG-SCHOOL", "12345678")
 
 while not sta.isconnected():
     pass
