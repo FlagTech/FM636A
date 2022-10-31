@@ -7,8 +7,8 @@ adc = ADC(adc_pin)         # 設定36為輸入腳位
 adc.width(ADC.WIDTH_10BIT) # 設定分辨率位元數(解析度)
 adc.atten(ADC.ATTN_11DB)   # 設定最大電壓
 
-max_val = 0    # 用來紀錄最大值
-time_mark = ticks_ms()    # 取得當前時間
+max_val = 0                # 用來紀錄最大值
+time_mark = ticks_ms()     # 取得當前時間
 
 while True:
     raw_val = adc.read()

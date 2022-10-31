@@ -14,10 +14,10 @@ sensor.setup_sensor()
 
 pox = Pulse_oximeter(sensor)
 
-dc_extractor = IIR_filter(0.99)    # 用於提取直流成份
+dc_extractor = IIR_filter(0.99)  # 用於提取直流成份
 
 while True:
-    pox.update()    # 更新血氧模組
+    pox.update()                 # 更新血氧模組
 
     if pox.available():
         red_val = pox.get_raw_red()

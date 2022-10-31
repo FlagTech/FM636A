@@ -1,4 +1,5 @@
-from utime import ticks_ms, ticks_diff # 匯入 utime 模組用以計時
+# 匯入 utime 模組用以計時
+from utime import ticks_ms, ticks_diff
 from machine import Pin, ADC
 import network, ESPWebServer
 
@@ -13,7 +14,8 @@ angle = 180               # 膚電反應轉換後角度
 def SendAngle(socket, args):    # 處理 /lie 指令的函式
     ESPWebServer.ok(socket, "200", str(angle))
 
-def gsr_to_angle(raw_val, min_val, max_val):  # 將膚電反應對應到180~360的函式
+# 將膚電反應對應到180~360的函式
+def gsr_to_angle(raw_val, min_val, max_val):  
     raw_val *= -1
     new_val = ((raw_val + max_val)
         /(max_val - min_val)*(360 - 180) + 180)
@@ -22,7 +24,7 @@ def gsr_to_angle(raw_val, min_val, max_val):  # 將膚電反應對應到180~360�
 print("連接中...")
 sta = network.WLAN(network.STA_IF)
 sta.active(True)
-sta.connect("熱點名稱", "熱點密碼")
+sta.connect("無線網路名稱", "無線網路密碼")
 
 while not sta.isconnected():
     pass
