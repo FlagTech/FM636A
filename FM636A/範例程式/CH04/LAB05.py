@@ -1,4 +1,5 @@
-from utime import ticks_ms, ticks_diff # 匯入 utime 模組用以計時
+# 匯入 utime 模組用以計時
+from utime import ticks_ms, ticks_diff
 from machine import SoftI2C, Pin
 import network, ESPWebServer
 from max30102 import MAX30102
@@ -24,7 +25,7 @@ def SendSpo2(socket, args):  # 處理 /handleCmd 指令的函式
 print("連接中...")
 sta = network.WLAN(network.STA_IF)
 sta.active(True)
-sta.connect("熱點名稱", "熱點密碼")
+sta.connect("無線網路名稱", "無線網路密碼")
 
 while not sta.isconnected():
     pass
@@ -32,7 +33,7 @@ while not sta.isconnected():
 print("已連接, ip為:", sta.ifconfig()[0])
 
 ESPWebServer.begin(80)                     # 啟用網站
-ESPWebServer.onPath("/measure", SendSpo2)  # 指定處理指令的函式
+ESPWebServer.onPath("/measure", SendSpo2)  
 
 time_mark = ticks_ms()
 while True:
