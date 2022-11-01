@@ -51,7 +51,7 @@ while True:
         thresh_pulse = thresh_gen_pulse.step(ppg)
 
         ##---------------偵測心跳開始---------------#
-        if ecg > (thresh_heart + 100) and not
+        if ecg > (thresh_heart + 100) and not \
         heart_is_beating:
             print("heart beat!")
             detected_heart_beat = True
@@ -62,7 +62,7 @@ while True:
         ##---------------偵測心跳結束---------------#
 
         ##---------------偵測脈搏開始---------------#
-        if ppg > (thresh_pulse + 20) and not
+        if ppg > (thresh_pulse + 20) and not \
         pulse_is_beating:
             led.value(0)
             print("pulse beat!")
