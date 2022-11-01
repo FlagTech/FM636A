@@ -38,7 +38,7 @@ def web_thread():    # 處理網頁的子執行緒函式
 print("連接中...")
 sta = network.WLAN(network.STA_IF)
 sta.active(True)
-sta.connect("FLAG-SCHOOL", "12345678")
+sta.connect("無線網路名稱", "無線網路密碼")
 
 while not sta.isconnected():
     pass
